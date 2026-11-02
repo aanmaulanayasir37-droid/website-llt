@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grup Discord Komunitas LLT V1.2</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&family=Montserrat:wght@800;900&display=swap" rel="stylesheet">
+
+    <style>
+        /* ==========================================
+           1. CORE STYLES & ANIMATION SETUP
+           ========================================== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #080512;
+            color: #f3f4f6;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        /* Ambient Background Particle Canvas */
+        #bgCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Container Layout for Mobile & Desktop */
+        .app-container {
+            width: 100%;
+            max-width: 520px;
+            background-color: rgba(15, 10, 28, 0.92);
+            backdrop-filter: blur(12px);
+            min-height: 100vh;
+            border-left: 1px solid rgba(139, 92, 246, 0.2);
+            border-right: 1px solid rgba(139, 92, 246, 0.2);
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 60px rgba(124, 58, 237, 0.2);
+        }
+
+        /* ==========================================
+           ANIMATION 1: RADIAL GLOW MOUSE & TOUCH FOLLOWER
+           ========================================== */
+        .glow-card {
+            position: relative;
+            overflow: hidden;
+            background-color: #160d29;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 14px;
+            transition: border-color 0.3s, transform 0.2s;
+        }
+
+        .glow-card::before {
+            content: '';
+            position: absolute;
+            top: var(--mouse-y, 50%);
+            left: var(--mouse-x, 50%);
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.4) 0%, rgba(6, 182, 212, 0.2) 40%, transparent 70%);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 50%;
+        }
+
+        .glow-card:hover::before,
+        .glow-card:active::before,
+        .glow-card.touch-active::before {
+            opacity: 1;
+        }
+
+        .glow-card:hover {
+            border-color: rgba(168, 85, 247, 0.6);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(168, 85, 247, 0.25);
+        }
+
+        /* ==========================================
+           ANIMATION 2: HOLOGRAPHIC SHIMMER & BADGE PULSE
+           ========================================== */
+        .ktp-card {
+            background: linear-gradient(145deg, #180b33, #0f0721);
+            border: 2px solid rgba(168, 85, 247, 0.4);
+            border-radius: 18px;
+            padding: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            position: relative;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        .ktp-card::after {
+            content: '';
+            position: absolute;
+            top: -150%;
+            left: -150%;
+            width: 300%;
+            height: 300%;
+            background: linear-gradient(
+                115deg,
+                transparent 30%,
+                rgba(255, 255, 255, 0.08) 45%,
+                rgba(6, 182, 212, 0.2) 50%,
+                rgba(168, 85, 247, 0.2) 55%,
+                transparent 70%
+            );
+            transform: rotate(25deg);
+            animation: ktpShimmer 6s infinite linear;
+            pointer-events: none;
+        }
+
+        @keyframes ktpShimmer {
+            0% { transform: translateY(-100%) rotate(25deg); }
+            100% { transform: translateY(100%) rotate(25deg); }
+        }
+
+        /* ==========================================
+           ANIMATION 3: PULSING STATUS INDICATOR
+           ========================================== */
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            background-color: #10b981;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .status-indicator::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            background-color: rgba(16, 185, 129, 0.4);
+            animation: pulseRing 2s infinite ease-out;
+        }
+
+        @keyframes pulseRing {
+            0% { transform: scale(0.8); opacity: 0.9; }
+            100% { transform: scale(2.4); opacity: 0; }
+        }
+
+        /* ==========================================
+           ANIMATION 4: NEON RIPPLE CLICK EFFECT
+           ========================================== */
+        .ripple-btn {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ripple-effect {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(34, 211, 238, 0.6) 0%, rgba(168, 85, 247, 0.2) 100%);
+            transform: scale(0);
+            animation: rippleAnim 0.6s linear;
+            pointer-events: none;
+        }
+
+        @keyframes rippleAnim {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* ==========================================
+           2. SIDEBAR STYLING
+           ========================================== */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100%;
+            background-color: #130a24;
+            border-right: 1px solid rgba(139, 92, 246, 0.3);
+            box-shadow: 10px 0 30px rgba(0, 0, 0, 0.8);
+            z-index: 100;
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 90;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #a855f7;
+        }
+
+        .close-sidebar {
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: #9ca3af;
+            transition: color 0.2s;
+        }
+
+        .close-sidebar:hover {
+            color: #ffffff;
+        }
+
+        .sidebar-links a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: #d1d5db;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            transition: all 0.2s;
+          }
+        .sidebar-links a:hover {
+            background-color: rgba(139, 92, 246, 0.15);
+            color: #c084fc;
+            transform: translateX(4px);
+        }
+
+        /* Top Bar Header */
+        .top-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background-color: rgba(19, 11, 36, 0.85);
+            backdrop-filter: blur(8px);
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+        }
+
+        .hamburger {
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            padding: 6px;
+        }
+
+        .hamburger span {
+            width: 22px;
+            height: 2.5px;
+            background-color: #c084fc;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        /* ==========================================
+           3. HOME PAGE COMPONENTS
+           ========================================== */
+        .hero-box {
+            background: linear-gradient(135deg, #180e30 0%, #110824 100%);
+            border: 1px solid rgba(139, 92, 246, 0.25);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            margin-bottom: 16px;
+        }
+
+        .hero-title {
+            font-size: 1.6rem;
+            font-weight: 900;
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(to right, #e9d5ff, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 4px;
+        }
+
+        .hero-subtitle {
+            font-size: 0.8rem;
+            color: #a78bfa;
+            margin-bottom: 16px;
+        }
+
+        /* Name Generator Input */
+        .name-generator-box {
+            margin-bottom: 16px;
+        }
+
+        .visitor-input {
+            width: 100%;
+            padding: 10px 14px;
+            background-color: rgba(12, 7, 20, 0.8);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 10px;
+            color: #ffffff;
+            font-size: 0.85rem;
+            outline: none;
+            transition: border-color 0.2s;
+            margin-bottom: 12px;
+        }
+
+        .visitor-input:focus {
+            border-color: #a855f7;
+            box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
+        }
+
+        .card-preview {
+            background-color: rgba(28, 16, 51, 0.9);
+            border: 1px dashed rgba(168, 85, 247, 0.4);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .card-header-tag {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+
+        .card-role-tag {
+            font-size: 0.65rem;
+            font-weight: 800;
+            color: #10b981;
+            letter-spacing: 0.5px;
+            font-family: monospace;
+        }
+
+        .card-name {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .card-subtext {
+            font-size: 0.75rem;
+            color: #a78bfa;
+        }
+
+        /* Discord Button */
+        .btn-discord {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(90deg, #7c3aed 0%, #4f46e5 100%);
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 0.85rem;
+            border-radius: 12px;
+            text-decoration: none;
+            text-align: center;
+            box-shadow: 0 0 15px rgba(124, 58, 237, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-discord:active {
+            transform: scale(0.98);
+        }
+
+        /* Grid Quick Access Buttons */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .menu-card {
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .menu-card h3 {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 2px;
+        }
+
+        .menu-card p {
+            font-size: 0.65rem;
+            color: #9ca3af;
+            line-height: 1.1;
+        }
+
+        /* Tab Content Modals */
+        .tab-content {
+            display: none;
+            background-color: #160c2d;
+            border: 1px solid rgba(168, 85, 247, 0.4);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 16px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .tab-content h2 {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #c084fc;
+            margin-bottom: 8px;
+        }
+
+        .tab-content ul {
+            padding-left: 18px;
+            font-size: 0.8rem;
+            color: #d1d5db;
+            margin-bottom: 12px;
+        }
+
+        .tab-content li {
+            margin-bottom: 4px;
+        }
+
+        .close-btn {
+            display: inline-block;
+            font-size: 0.75rem;
+            color: #f43f5e;
+            font-weight: 700;
+            cursor: pointer;
+            float: right;
+            padding: 4px 8px;
+            border-radius: 6px;
+            background: rgba(244, 63, 94, 0.1);
+        }
+
+        /* Games & Topics Section */
+        .section-box {
+            background-color: rgba(20, 12, 38, 0.8);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: #e9d5ff;
+            text-align: center;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .topics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .topic-card {
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .game-img {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+        }
+
+        .topic-icon {
+            font-size: 1.1rem;
+        }
+
+        .topic-card span {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #e5e7eb;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Server Staff Section */
+        .staff-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .staff-card {
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .staff-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .staff-info h3 {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .badge {
+            font-size: 0.6rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+            display: inline-block;
+            margin-top: 2px;
+        }
+
+        .badge.owner {
+            background-color: rgba(245, 158, 11, 0.2);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.4);
+        }
+
+        .badge.admin {
+            background-color: rgba(168, 85, 247, 0.2);
+            color: #c084fc;
+            border: 1px solid rgba(168, 85, 247, 0.4);
+        }
+
+        /* Social Media Grid */
+        .user-social-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .user-social-card {
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .social-icon-svg {
+            width: 22px;
+            height: 22px;
+            flex-shrink: 0;
+        }
+
+        .user-name {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .platform-name {
+            display: block;
+            font-size: 0.65rem;
+            color: #9ca3af;
+        }
+
+        /* KTP Card Elements */
+        .ktp-header {
+            text-align: center;
+            border-bottom: 2px solid rgba(168, 85, 247, 0.3);
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+          }
+        .ktp-title-main {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            color: #f3f4f6;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .ktp-title-sub {
+            display: block;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #06b6d4;
+            letter-spacing: 0.5px;
+        }
+
+        .ktp-body {
+            display: flex;
+            gap: 14px;
+            align-items: center;
+        }
+
+        .ktp-photo-box {
+            width: 90px;
+            height: 110px;
+            background-color: #120924;
+            border: 1px dashed rgba(168, 85, 247, 0.5);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .ktp-avatar {
+            font-size: 2.2rem;
+            color: #a78bfa;
+        }
+
+        .ktp-photo-label {
+            font-size: 0.55rem;
+            font-weight: 800;
+            color: #06b6d4;
+            margin-top: 4px;
+            text-align: center;
+        }
+
+        .ktp-info-box {
+            flex: 1;
+        }
+
+        .ktp-field {
+            margin-bottom: 6px;
+        }
+
+        .ktp-label {
+            display: block;
+            font-size: 0.55rem;
+            color: #9ca3af;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .ktp-value {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: #ffffff;
+            font-family: monospace;
+        }
+
+        .ktp-value.text-accent {
+            color: #10b981;
+            text-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+        }
+
+        .ktp-footer {
+            margin-top: 12px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(139, 92, 246, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.6rem;
+            color: #9ca3af;
+        }
+
+        .ktp-stamp {
+            color: #10b981;
+            font-weight: 800;
+            border: 1px solid #10b981;
+            padding: 1px 5px;
+            border-radius: 4px;
+            box-shadow: 0 0 6px rgba(16, 185, 129, 0.3);
+        }
+
+        /* ==========================================
+           5. WELCOME OVERLAY MODAL V1.2
+           ========================================== */
+        #welcomeModal {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            background: rgba(4, 2, 10, 0.92);
+            backdrop-filter: blur(8px);
+            transition: opacity 0.5s ease;
+        }
+
+        #welcomeModal.hidden {
+            display: none;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #particleCanvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .welcome-content {
+            position: relative;
+            z-index: 20;
+            text-align: center;
+            max-width: 360px;
+            width: 100%;
+            padding: 24px 20px;
+            background: rgba(19, 11, 36, 0.95);
+            border-radius: 24px;
+            border: 1px solid rgba(168, 85, 247, 0.5);
+            box-shadow: 0 0 50px rgba(168, 85, 247, 0.4);
+            animation: textAppear 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .neon-title {
+            font-size: 1.6rem;
+            font-weight: 900;
+            font-family: 'Montserrat', sans-serif;
+            color: #ffffff;
+            line-height: 1.25;
+            text-shadow: 0 0 12px rgba(168, 85, 247, 0.8), 0 0 24px rgba(124, 58, 237, 0.5);
+            margin-bottom: 8px;
+        }
+
+        .neon-highlight {
+            color: #22d3ee;
+            text-shadow: 0 0 12px rgba(34, 211, 238, 0.8), 0 0 24px rgba(6, 182, 212, 0.5);
+        }
+
+        .divider-line {
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #a855f7, #06b6d4);
+            margin: 12px auto;
+            border-radius: 99px;
+        }
+
+        .welcome-subtext {
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: #e9d5ff;
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .btn-enter {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            background: linear-gradient(90deg, #9333ea, #0891b2);
+            color: #ffffff;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(147, 51, 234, 0.5);
+            transition: transform 0.2s;
+        }
+
+        .btn-enter:active {
+            transform: scale(0.96);
+        }
+
+        @keyframes textAppear {
+            0% {
+                opacity: 0;
+                transform: scale(0.85) translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Footer */
+        .app-footer {
+            text-align: center;
+            padding: 16px;
+            font-size: 0.7rem;
+            color: #6b7280;
+            margin-top: auto;
+        }
+
+        .version-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #1c1033;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            color: #c084fc;
+            border-radius: 99px;
+            font-size: 0.7rem;
+            font-family: monospace;
+            cursor: pointer;
+            margin-bottom: 8px;
+            transition: all 0.2s;
+        }
+
+        .version-badge:hover {
+            border-color: #06b6d4;
+            color: #22d3ee;
+            box-shadow: 0 0 10px rgba(34, 211, 238, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <!-- AMBIENT BACKGROUND CANVAS -->
+    <canvas id="bgCanvas"></canvas>
+
+    <!-- SIDEBAR OVERLAY BACKGROUND -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <!-- SIDEBAR MENU -->
+    <div class="sidebar" id="mySidebar">
+        <div class="sidebar-header">
+            <h2>LLT Navigasi</h2>
+            <span class="close-sidebar" onclick="toggleSidebar()">✕</span>
+        </div>
+        <div class="sidebar-links">
+            <a href="javascript:void(0)" onclick="showHome(); toggleSidebar();" class="ripple-btn">
+                <i class="fa-solid fa-house text-purple-400"></i> Beranda
+            </a>
+            <a href="javascript:void(0)" onclick="showProfilePage(); toggleSidebar();" class="ripple-btn">
+                <i class="fa-solid fa-id-card text-cyan-400"></i> Profil Saya (KTP)
+            </a>
+        </div>
+    </div>
+
+    <!-- MAIN APP WRAPPER -->
+    <div class="app-container">
+
+        <!-- TOP HEADER -->
+        <div class="top-header">
+            <div class="hamburger" onclick="toggleSidebar()" aria-label="Toggle Navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="font-black text-sm font-display tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-cyan-300">
+                Komunitas LLT <span class="text-[10px] px-1.5 py-0.5 rounded bg-purple-900/50 border border-purple-500/30 text-purple-300">v1.2</span>
+            </div>
+            <button onclick="openWelcomeModal()" class="text-purple-300 hover:text-cyan-300 text-sm transition-colors" title="Putar Ulang Animasi Welcome">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+            </button>
+        </div>
+
+        <!-- ==========================================
+             PAGE 1: HALAMAN BERANDA (HOME)
+             ========================================== -->
+        <main id="homePage" class="p-4 space-y-4">
+
+            <!-- HERO BOX -->
+            <div class="hero-box">
+                <h1 class="hero-title">Komunitas LLT</h1>
+                <p class="hero-subtitle">Tempat nongkrong, seru-seruan, dan diskusi bareng!</p>
+
+                <!-- DYNAMIC NAME GENERATOR INPUT -->
+                <div class="name-generator-box">
+                    <input type="text" id="visitorInput" class="visitor-input" placeholder="Ketik nama/nickname kamu..." oninput="updateWelcomeCard()" maxlength="16">
+                    
+                    <div class="card-preview glow-card">
+                        <div class="card-header-tag">
+                            <span class="status-indicator"></span>
+                            <span class="card-role-tag">FUTURE MEMBER</span>
+                        </div>
+                        <div class="card-name" id="displayName">Guest_LLT</div>
+                        <div class="card-subtext">Siap bergabung dengan komunitas LLT!</div>
+                    </div>
+                </div>
+
+                <!-- CTA DISCORD -->
+                <a href="https://discord.gg/3sWCfWBBx" target="_blank" rel="noopener noreferrer" class="btn-discord ripple-btn">
+                    <i class="fa-brands fa-discord mr-2"></i> Join Discord LLT
+                </a>
+            </div>
+
+            <!-- MENU GRID BUTTONS -->
+            <div class="menu-grid">
+                <div class="menu-card glow-card ripple-btn" onclick="openTab('info-tab')">
+                    <h3>ℹ️ Info</h3>
+                    <p>Informasi seputar grup</p>
+                </div>
+                <div class="menu-card glow-card ripple-btn" onclick="openTab('rules-tab')">
+                    <h3>📜 Rules</h3>
+                    <p>Aturan komunitas</p>
+                </div>
+                <div class="menu-card glow-card ripple-btn" onclick="openTab('member-tab')">
+                    <h3>👥 Member</h3>
+                    <p>Daftar anggota & role</p>
+                </div>
+            </div>
+
+            <!-- TAB CONTENT: INFO -->
+            <div id="info-tab" class="tab-content">
+                <h2>ℹ️ Informasi Grup</h2>
+                <p style="font-size: 0.8rem; color: #d1d5db; margin-bottom: 10px; line-height: 1.4;">
+                    Selamat datang di Komunitas LLT! Grup ini dibentuk untuk tempat mabar, diskusi art/design, serta berbagi pengalaman positif sesama anggota.
+                </p>
+                <span class="close-btn ripple-btn" onclick="closeTabs()">Tutup ✖</span>
+            </div>
+
+            <!-- TAB CONTENT: RULES -->
+            <div id="rules-tab" class="tab-content">
+                <h2>📜 Aturan Komunitas</h2>
+                <ul>
+                    <li>Saling menghormati antar sesama member.</li>
+                    <li>Dilarang spam, toxic berlebihan, atau promosi tanpa izin.</li>
+                    <li>Gunakan channel sesuai dengan topik pembicaraan.</li>
+                </ul>
+                <span class="close-btn ripple-btn" onclick="closeTabs()">Tutup ✖</span>
+            </div>
+
+            <!-- TAB CONTENT: MEMBER -->
+            <div id="member-tab" class="tab-content">
+                <h2>👥 Daftar Anggota & Role</h2>
+                <p style="font-size: 0.8rem; color: #d1d5db; margin-bottom: 10px; line-height: 1.4;">
+                    Total anggota terdaftar aktif saat ini di server Discord LLT dapat dilihat melalui role masing-masing di dalam server.
+                </p>
+                <span class="close-btn ripple-btn" onclick="closeTabs()">Tutup ✖</span>
+            </div>
+
+            <!-- GAME & TOPIK POPULER -->
+            <div class="section-box">
+                <div class="section-title">
+                    <i class="fa-solid fa-gamepad text-purple-400"></i> Game & Topik Populer
+                </div>
+                <div class="topics-grid">
+                    <div class="topic-card glow-card">
+                        <i class="fa-solid fa-shield-halved text-blue-400 topic-icon"></i>
+                        <span>Mobile Legends</span>
+                    </div>
+                    <div class="topic-card glow-card">
+                        <img src="https://img.icons8.com/color/96/roblox.png" alt="Roblox" class="game-img">
+                        <span>Roblox</span>
+                    </div>
+                    <div class="topic-card glow-card">
+                        <img src="https://img.icons8.com/color/96/minecraft-logo.png" alt="Minecraft" class="game-img">
+                        <span>Minecraft</span>
+                    </div>
+                    <div class="topic-card glow-card">
+                        <span class="topic-icon">🎵</span>
+                        <span>Music & Hangout</span>
+                    </div>
+                    <div class="topic-card glow-card">
+                        <span class="topic-icon">🎨</span>
+                        <span>Menggambar</span>
+                    </div>
+                    <div class="topic-card glow-card">
+                        <span class="topic-icon">💻</span>
+                        <span>Design/Edit</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PENGURUS SERVER -->
+            <div class="section-box">
+                <div class="section-title">
+                    <i class="fa-solid fa-crown text-amber-400"></i> Pengurus Server
+                </div>
+                <div class="staff-grid">
+                    <div class="staff-card glow-card">
+                        <div class="staff-avatar">👑</div>
+                        <div class="staff-info">
+                            <h3>castrodoc</h3>
+                            <span class="badge owner">Server Owner</span>
+                        </div>
+                    </div>
+                    <div class="staff-card glow-card">
+                        <div class="staff-avatar">🛡️</div>
+                        <div class="staff-info">
+                            <h3>1Idlexyre</h3>
+                            <span class="badge admin">Head Admin</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MEDIA SOSIAL -->
+            <div class="section-box">
+                <div class="section-title">
+                    <i class="fa-solid fa-globe text-cyan-400"></i> Media Sosial Admin & Member
+                </div>
+                <div class="user-social-grid">
+                    <a href="https://www.tiktok.com" target="_blank" rel="noopener noreferrer" class="user-social-card glow-card ripple-btn">
+                        <svg class="social-icon-svg" viewBox="0 0 24 24" fill="#ffffff">
+                            <path d="M19.589 6.686a4.793 4.793 0 0 1-3.77-4.245V2h-3.445v13.672a2.896 2.896 0 0 1-5.201 1.743l-.002-.001a2.895 2.895 0 0 1 3.183-4.51v-3.5a6.329 6.329 0 0 0-5.394 2.21 6.34 6.34 0 0 0 10.858 4.387V9.3a8.16 8.16 0 0 0 4.771 1.528V7.383a4.843 4.843 0 0 1-1.002-.697z"/>
+                        </svg>
+                        <div>
+                            <span class="user-name">NamaOwner</span>
+                            <span class="platform-name">TikTok</span>
+                        </div>
+                    </a>
+                    <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" class="user-social-card glow-card ripple-btn">
+                        <svg class="social-icon-svg" viewBox="0 0 24 24" fill="#e1306c">
+                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                        </svg>
+                        <div>
+                            <span class="user-name">NamaAdmin1</span>
+                            <span class="platform-name">Instagram</span>
+                        </div>
+                    </a>
+                    <a href="https://www.youtube.com/@vervey_mc" target="_blank" rel="noopener noreferrer" class="user-social-card glow-card ripple-btn">
+                        <svg class="social-icon-svg" viewBox="0 0 24 24" fill="#ff0000">
+                            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                        </svg>
+                        <div>
+                            <span class="user-name">vervey</span>
+                            <span class="platform-name">YouTube</span>
+                        </div>
+                    </a>
+                    <a href="https://www.tiktok.com/@vervey.mc" target="_blank" rel="noopener noreferrer" class="user-social-card glow-card ripple-btn">
+                        <svg class="social-icon-svg" viewBox="0 0 24 24" fill="#ffffff">
+                            <path d="M19.589 6.686a4.793 4.793 0 0 1-3.77-4.245V2h-3.445v13.672a2.896 2.896 0 0 1-5.201 1.743l-.002-.001a2.895 2.895 0 0 1 3.183-4.51v-3.5a6.329 6.329 0 0 0-5.394 2.21 6.34 6.34 0 0 0 10.858 4.387V9.3a8.16 8.16 0 0 0 4.771 1.528V7.383a4.843 4.843 0 0 1-1.002-.697z"/>
+                        </svg>
+                        <div>
+                            <span class="user-name">vervey</span>
+                            <span class="platform-name">TikTok</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+        </main>
+        <!-- ==========================================
+             PAGE 2: HALAMAN PROFIL SAYA (KTP)
+             ========================================== -->
+        <main id="profilePage" class="p-4 space-y-4" style="display: none;">
+            
+            <!-- HOLOGRAPHIC KTP CARD -->
+            <div class="ktp-card">
+                <div class="ktp-header">
+                    <span class="ktp-title-main">KARTU TANDA ANGGOTA</span>
+                    <span class="ktp-title-sub">KOMUNITAS DISCORD LLT</span>
+                </div>
+                
+                <div class="ktp-body">
+                    <!-- Photo Upload Area -->
+                    <div class="ktp-photo-box" onclick="triggerPhotoUpload()" title="Klik untuk ubah foto">
+                        <img id="ktpPhotoImg" src="" alt="Profil Photo" style="display: none; width: 100%; height: 100%; object-fit: cover;">
+                        <div id="ktpDefaultAvatar" class="ktp-avatar">👤</div>
+                        <span class="ktp-photo-label" id="ktpPhotoLabel">UBAH FOTO</span>
+                        <input type="file" id="photoInput" accept="image/*" style="display: none;" onchange="uploadPhoto(event)">
+                    </div>
+
+                    <!-- KTP User Information -->
+                    <div class="ktp-info-box">
+                        <div class="ktp-field">
+                            <span class="ktp-label">NIK (ID)</span>
+                            <span class="ktp-value" id="ktpId">LLT-839210</span>
+                        </div>
+                        <div class="ktp-field">
+                            <span class="ktp-label">NAMA</span>
+                            <span class="ktp-value" id="ktpName">Guest_LLT</span>
+                        </div>
+                        <div class="ktp-field">
+                            <span class="ktp-label">STATUS</span>
+                            <span class="ktp-value text-accent">MEMBER AKTIF</span>
+                        </div>
+                        <div class="ktp-field">
+                            <span class="ktp-label">DOMISILI</span>
+                            <span class="ktp-value">SERVER DISCORD</span>
+                        </div>
+                        <div class="ktp-field">
+                            <span class="ktp-label">BERLAKU</span>
+                            <span class="ktp-value">SEUMUR HIDUP</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ktp-footer">
+                    <span>LLT OFFICIAL MEMBER CARD</span>
+                    <span class="ktp-stamp">VERIFIED ✓</span>
+                </div>
+            </div>
+
+            <button onclick="showHome()" class="btn-discord ripple-btn" style="border: none; cursor: pointer; background: linear-gradient(90deg, #374151, #1f2937);">
+                ⬅ Kembali ke Beranda
+            </button>
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="app-footer">
+            <div class="version-badge ripple-btn" onclick="openWelcomeModal()" id="versionBadge">
+                LLT Version 1.2
+            </div>
+            <p>&copy; 2026 Komunitas LLT. Created with ❤️</p>
+        </footer>
+    </div>
+
+    <!-- WELCOME OVERLAY SPLASH SCREEN V1.2 -->
+    <div id="welcomeModal">
+        <canvas id="particleCanvas"></canvas>
+        <div class="welcome-content">
+            <h1 class="neon-title">
+                SELAMAT<br>DATANG DI<br><span class="neon-highlight">WEBSITE LLT</span>
+            </h1>
+            <div class="divider-line"></div>
+            <p class="welcome-subtext">
+                KOMUNITAS LLT V1.2 - TEMPAT TERBAIKMU UNTUK NONGKRONG & SERU-SERUAN!
+            </p>
+            <button class="btn-enter ripple-btn" onclick="closeWelcomeModal()">
+                Masuk ke Website <i class="fa-solid fa-arrow-right ml-1"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         JAVASCRIPT ANIMATION & APP LOGIC
+         ========================================== -->
+    <script>
+        // OnLoad Hooks & State Setup
+        window.addEventListener('DOMContentLoaded', function() {
+            let savedName = localStorage.getItem("visitorName");
+            if (savedName) {
+                document.getElementById("visitorInput").value = savedName;
+                document.getElementById("displayName").innerText = savedName;
+                document.getElementById("ktpName").innerText = savedName;
+            }
+
+            let savedPhoto = localStorage.getItem("ktpProfilePhoto");
+            if (savedPhoto) {
+                applyPhoto(savedPhoto);
+            }
+
+            generateNIK();
+            openWelcomeModal();
+            initMouseFollower();
+            initRippleEffect();
+            initBackgroundParticles();
+        });
+
+        // ANIMATION 1: Mouse & Touch Follower for Hover Glow Neon
+        function initMouseFollower() {
+            document.querySelectorAll('.glow-card').forEach(card => {
+                const updateGlowPosition = (clientX, clientY) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = clientX - rect.left;
+                    const y = clientY - rect.top;
+                    card.style.setProperty('--mouse-x', `${x}px`);
+                    card.style.setProperty('--mouse-y', `${y}px`);
+                };
+
+                // Mouse Events
+                card.addEventListener('mousemove', e => {
+                    updateGlowPosition(e.clientX, e.clientY);
+                });
+
+                // Touch Events (Mobile Support)
+                card.addEventListener('touchstart', e => {
+                    card.classList.add('touch-active');
+                    if (e.touches[0]) {
+                        updateGlowPosition(e.touches[0].clientX, e.touches[0].clientY);
+                    }
+                }, { passive: true });
+
+                card.addEventListener('touchmove', e => {
+                    if (e.touches[0]) {
+                        updateGlowPosition(e.touches[0].clientX, e.touches[0].clientY);
+                    }
+                }, { passive: true });
+
+                card.addEventListener('touchend', () => {
+                    setTimeout(() => card.classList.remove('touch-active'), 500);
+                });
+            });
+        }
+
+        // ANIMATION 4: Floating Ambient Background Particles
+        function initBackgroundParticles() {
+            const bgCanvas = document.getElementById('bgCanvas');
+            const bgCtx = bgCanvas.getContext('2d');
+            let bgParticles = [];
+
+            function resizeBgCanvas() {
+                bgCanvas.width = window.innerWidth;
+                bgCanvas.height = window.innerHeight;
+            }
+
+            window.addEventListener('resize', resizeBgCanvas);
+            resizeBgCanvas();
+
+            for (let i = 0; i < 40; i++) {
+                bgParticles.push({
+                    x: Math.random() * bgCanvas.width,
+                    y: Math.random() * bgCanvas.height,
+                    radius: Math.random() * 2 + 0.5,
+                    color: Math.random() > 0.5 ? '#a855f7' : '#06b6d4',
+                    alpha: Math.random() * 0.5 + 0.1,
+                    speedY: Math.random() * 0.4 + 0.1
+                });
+            }
+
+            function drawBgParticles() {
+                bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+                bgParticles.forEach(p => {
+                    bgCtx.beginPath();
+                    bgCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    bgCtx.fillStyle = p.color;
+                    bgCtx.globalAlpha = p.alpha;
+                    bgCtx.fill();
+
+                    p.y -= p.speedY;
+                    if (p.y < 0) {
+                        p.y = bgCanvas.height;
+                        p.x = Math.random() * bgCanvas.width;
+                    }
+                });
+                requestAnimationFrame(drawBgParticles);
+            }
+            drawBgParticles();
+        }
+
+        // ANIMATION 5: Neon Ripple Button Effect
+        function initRippleEffect() {
+            document.querySelectorAll('.ripple-btn').forEach(button => {
+                button.addEventListener('click', function (e) {
+                    const circle = document.createElement('span');
+                    const diameter = Math.max(this.clientWidth, this.clientHeight);
+                    const radius = diameter / 2;
+
+                    const rect = this.getBoundingClientRect();
+                    circle.style.width = circle.style.height = `${diameter}px`;
+                    circle.style.left = `${e.clientX - rect.left - radius}px`;
+                    circle.style.top = `${e.clientY - rect.top - radius}px`;
+                    circle.classList.add('ripple-effect');
+
+                    const ripple = this.getElementsByClassName('ripple-effect')[0];
+                    if (ripple) {
+                        ripple.remove();
+                    }
+
+                    this.appendChild(circle);
+                });
+            });
+        }
+
+        // Navigation Sidebar Logic
+        function toggleSidebar() {
+            const sidebar = document.getElementById('mySidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        function showHome() {
+            document.getElementById('homePage').style.display = 'block';
+            document.getElementById('profilePage').style.display = 'none';
+        }
+
+        function showProfilePage() {
+            document.getElementById('homePage').style.display = 'none';
+            document.getElementById('profilePage').style.display = 'block';
+        }
+
+        // Tab Content Logic
+        function openTab(tabId) {
+            closeTabs();
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        function closeTabs() {
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+        }
+
+        // Live Name Update Logic
+        function updateWelcomeCard() {
+            let input = document.getElementById("visitorInput").value;
+            let nameDisplay = document.getElementById("displayName");
+            let ktpName = document.getElementById("ktpName");
+            
+            if (input.trim() !== "") {
+                nameDisplay.innerText = input;
+                ktpName.innerText = input;
+                localStorage.setItem("visitorName", input);
+            } else {
+                nameDisplay.innerText = "Guest_LLT";
+                ktpName.innerText = "Guest_LLT";
+                localStorage.removeItem("visitorName");
+            }
+        }
+
+        // NIK ID Generator Logic
+        function generateNIK() {
+            let savedNik = localStorage.getItem("ktpNikId");
+            if (savedNik) {
+                document.getElementById("ktpId").innerText = savedNik;
+            } else {
+                let randomNum = Math.floor(100000 + Math.random() * 900000);
+                let newNik = "LLT-" + randomNum;
+                document.getElementById("ktpId").innerText = newNik;
+                localStorage.setItem("ktpNikId", newNik);
+            }
+        }
+
+        // KTP Photo Upload Logic
+        function triggerPhotoUpload() {
+            document.getElementById("photoInput").click();
+        }
+
+        function uploadPhoto(event) {
+            let file = event.target.files[0];
+            if (file) {
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    let photoUrl = e.target.result;
+                    applyPhoto(photoUrl);
+                    localStorage.setItem("ktpProfilePhoto", photoUrl);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function applyPhoto(photoUrl) {
+            let img = document.getElementById("ktpPhotoImg");
+            let defaultAvatar = document.getElementById("ktpDefaultAvatar");
+            let label = document.getElementById("ktpPhotoLabel");
+
+            img.src = photoUrl;
+            img.style.display = "block";
+            defaultAvatar.style.display = "none";
+            label.innerText = "GANTI FOTO";
+        }
+
+        // Modal Welcome Overlay Canvas Particle Engine
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let animationFrameId;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 3 + 1;
+                this.speedX = (Math.random() - 0.5) * 1.5;
+                this.speedY = (Math.random() - 0.5) * 1.5;
+                
+                const colors = ['#06b6d4', '#a855f7', '#ec4899', '#c084fc', '#38bdf8'];
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+                this.alpha = Math.random() * 0.8 + 0.2;
+                this.pulseSpeed = Math.random() * 0.02 + 0.005;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.alpha += Math.sin(Date.now() * this.pulseSpeed) * 0.01;
+
+                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = Math.max(0.1, Math.min(1, this.alpha));
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            const particleCount = Math.min(Math.floor(window.innerWidth / 10), 60);
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            animationFrameId = requestAnimationFrame(animateParticles);
+        }
+        // Modal Welcome Controls
+        const welcomeModal = document.getElementById('welcomeModal');
+
+        function openWelcomeModal() {
+            welcomeModal.classList.remove('hidden');
+            resizeCanvas();
+            initParticles();
+            cancelAnimationFrame(animationFrameId);
+            animateParticles();
+        }
+
+        function closeWelcomeModal() {
+            welcomeModal.style.opacity = '0';
+            setTimeout(() => {
+                welcomeModal.classList.add('hidden');
+                welcomeModal.style.opacity = '1';
+                cancelAnimationFrame(animationFrameId);
+            }, 500);
+        }
+    </script>
+</body>
+</html>
